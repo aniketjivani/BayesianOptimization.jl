@@ -36,17 +36,26 @@ upon an incumbent target `τ`. For Gaussian distributions it is given by
 where `ϕ` is the standard normal distribution function and `Φ` is the standard
 normal cumulative function, and `μ(x)`, `σ(x)` are mean and standard deviation
 of the distribution at point `x`.
+
+We can also introduce a new hyperparameter `ξ` that controls the tradeoff between exploration and exploitation.
+Then, the expected improvement is given by:
+
+    (μ(x) - τ - ξ) * ϕ[(μ(x) - τ - ξ)/σ(x)] + σ(x) * Φ[(μ(x) - τ)/σ(x)]
+
+For ξ = 0, we just end up with the previous formula. But for large values of ξ, the algorithm will actually favour more exploration since we are inflating
+the best value in the first term.
 """
 mutable struct ExpectedImprovement <: AbstractAcquisition
     τ::Float64
+    ξ::Float64
 end
-ExpectedImprovement(; τ = -Inf) = ExpectedImprovement(τ)
+ExpectedImprovement(; τ = -Inf, ξ = 0) = ExpectedImprovement(τ, ξ)
 function setparams!(a::Union{ExpectedImprovement,ProbabilityOfImprovement}, model)
     a.τ = max(maxy(model), a.τ)
 end
 @inline function (a::ExpectedImprovement)(μ, σ²)
     σ² == 0 && return μ > a.τ ? μ - a.τ : 0.
-    (μ - a.τ) * normal_cdf(μ - a.τ, σ²) + √σ² * normal_pdf(μ - a.τ, σ²)
+    (μ - a.τ - a.ξ) * normal_cdf(μ - a.τ - a.ξ, σ²) + √σ² * normal_pdf(μ - a.τ - ξ, σ²)
 end
 
 abstract type BetaScaling end
