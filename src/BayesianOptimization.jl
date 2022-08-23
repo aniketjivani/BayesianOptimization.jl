@@ -1,7 +1,8 @@
 """
 This package exports
 * `BOpt`, `boptimize!`
-* acquisition types: `ExpectedImprovement`, `ProbabilityOfImprovement`, `UpperConfidenceBound`, `ThompsonSamplingSimple`, `MutualInformation`
+* acquisition types: `ExpectedImprovement`, `ProbabilityOfImprovement`, `UpperConfidenceBound`, `ThompsonSamplingSimple`, `MutualInformation`, 
+`ExpectedFeasibility`
 * scaling of standard deviation in `UpperConfidenceBound`: `BrochuBetaScaling`, `NoBetaScaling`
 * GP hyperparameter optimizer: `MAPGPOptimizer`, `NoModelOptimizer`
 * Initializer: `ScaledSobolIterator`, `ScaledLHSIterator`
@@ -18,7 +19,7 @@ import GaussianProcesses: GPBase, GPE
 import ElasticArrays: ElasticArray
 using ForwardDiff, DiffResults, Random, Dates, SpecialFunctions, TimerOutputs
 export BOpt, ExpectedImprovement, ProbabilityOfImprovement,
-UpperConfidenceBound, ThompsonSamplingSimple, MutualInformation, boptimize!,
+UpperConfidenceBound, ExpectedFeasibility, ThompsonSamplingSimple, MutualInformation, boptimize!,
 MAPGPOptimizer, NoModelOptimizer, Min, Max, BrochuBetaScaling, NoBetaScaling,
 Silent, Timings, Progress, ScaledSobolIterator, ScaledLHSIterator, maxduration!,
 maxiterations!

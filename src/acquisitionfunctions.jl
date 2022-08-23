@@ -58,6 +58,28 @@ end
     (μ - a.τ - a.ξ) * normal_cdf(μ - a.τ - a.ξ, σ²) + √σ² * normal_pdf(μ - a.τ - ξ, σ²)
 end
 
+"""
+Expected Feasibility is defined as follows, for a given threshold t and a given ϵ to explore around t:
+    EFF(x, t, ϵ) = (μ(x) - τ) * ϕ[(μ(x) - τ)/σ(x)] + σ(x) * Φ[(μ(x) - τ)/σ(x)]
+
+    where ϕ is the standard normal distribution function and Φ is the standard normal cumulative function, and μ(x) and σ(x) 
+    are mean and standard deviation of the distribution at point x.
+"""
+mutable struct ExpectedFeasibility <: AbstractAcquisition
+    t::Float64
+    ϵ::Float64
+end
+ExpectedFeasibility(; t = 0, ϵ = 2) = ExpectedFeasibility(t, ϵ)
+@inline function (a::ExpectedFeasibility)(μ, σ²)
+    σ² == 0 && return μ > a.t ? μ - a.t : 0.
+    tplus = a.t + a.ϵ * √σ²
+    tminus = a.t - a.ϵ * √σ²
+
+    (μ - a.t) * (2 * normal_cdf(a.t - μ, σ²) - normal_cdf(tminus - μ, σ²) - normal_cdf(tplus - μ, σ²)) 
+    - √σ² * (2 * normal_pdf(a.t - μ, σ²) - normal_pdf(tminus - μ, σ²) - normal_pdf(tplus - μ, σ²))
+    + a.ϵ * (normal_cdf(tplus - μ, σ²) - normal_cdf(tminus - μ, σ²))
+end
+
 abstract type BetaScaling end
 """
 Scales `βt` of `UpperConfidenceBound` as
